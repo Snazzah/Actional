@@ -2,9 +2,9 @@ import SocketIOClient from 'socket.io-client';
 import urlParser from 'socket.io-client/lib/url';
 import EventEmitter from 'eventemitter3';
 import debugModule from 'debug';
-import { ActionalResponse, ActionalResponseError, Conditions, FindClientsResponse, LooseConditions, SendToClientResponse } from './constants';
+import { ActionalResponse, ResponseCode, ActionalResponseError, Callback, Conditions, FindClientsResponse, LooseConditions, SendToClientResponse } from './constants';
 import { sendAndRecieve } from './utils';
-import { ResponseError } from './errors';
+import { ActionalError, ResponseError } from './errors';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const allSettled = require('promise.allsettled');
 const debug = debugModule('actional:client');
@@ -18,6 +18,11 @@ export interface ActionalClientOptions {
 }
 
 type ConditionalValue = boolean | (<T extends unknown[]>(...args: T) => (boolean | Promise<boolean>))
+
+const BuiltInClientEvents = [
+  'connect', 'disconnect', 'error', 'connect_error', 'connect_timeout',
+  'reconnect', 'reconnect_attempt', 'reconnecting', 'reconnect_error', 'reconnect_failed'
+];
 
 class ActionalClient extends EventEmitter {
   public readonly socket: SocketIOClient.Socket;
@@ -41,13 +46,14 @@ class ActionalClient extends EventEmitter {
 
     // Prioritize websockets
     Object.assign(options, { transports: ['websocket', 'polling'] });
+    this.socket = SocketIOClient(url, options);
     this.manager = SocketIOClient.managers[urlParser(url).id];
     this.conditionals = conditionals || {};
     this._hookEvents();
   }
 
   private _hookEvents(): void {
-    this.socket.on('actional_condition', async (conditions: Conditions, callback: (data: unknown) => void) => {
+    this.socket.on('actional_condition', async (conditions: Conditions, callback: Callback) => {
       debug('sending conditions', conditions.map(c => c[0]));
       const results = {};
     
@@ -93,7 +99,41 @@ class ActionalClient extends EventEmitter {
   }
 
   async sendToClient<T>(clientId: string, eventName: string, ...args: unknown[]): Promise<SendToClientResponse<T>> {
-    return this._sendAndRecieve('actional_sendToSocket', clientId, eventName, args) as Promise<SendToClientResponse<T>>;
+    return this._sendAndRecieve('actional_sendToClient', clientId, eventName, args) as Promise<SendToClientResponse<T>>;
+  }
+
+  defineEvent(eventName: string, func: <T extends unknown[], R = unknown>(...args: T) => R | Promise<R>): ActionalClient {
+    if (BuiltInClientEvents.includes(eventName))
+      throw new ActionalError('You can\'t define a built-in event!', 'defineEvent');
+    else if (eventName.startsWith('actional_'))
+      throw new ActionalError('You can\'t define an actional event!', 'defineEvent');
+    
+    debug('defining event "%s"', eventName);
+
+    this.socket.on(eventName, async (...args: (unknown|Callback)[]) => {
+      const callback = args.pop() as Callback;
+      try {
+        let result = func(...args);
+        if (result instanceof Promise)
+          result = await result;
+
+        let callbackData = {
+          ok: true, result
+        };
+        if (typeof result === 'object')
+          callbackData = { ...result, ...callbackData };
+        else callbackData.result = result;
+        callback({ ok: true, result });
+      } catch (err) {
+        callback({
+          ok: false,
+          code: ResponseCode.ClientError,
+          error: err.toString()
+        });
+      }
+    });
+
+    return this;
   }
 }
 

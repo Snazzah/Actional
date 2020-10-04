@@ -1,7 +1,7 @@
 import SocketIO, { Namespace } from 'socket.io';
 import Collection from '@discordjs/collection';
 import { definePromise, PromiseDefinition, sendAndRecieve } from './utils';
-import { ConditionsResponse, FindSocketsPayload, ResponseCode } from './constants';
+import { ActionalResponseError, ClientEventResponse, ConditionsResponse, FindSocketsPayload, ResponseCode } from './constants';
 import EventEmitter from 'eventemitter3';
 import debugModule from 'debug';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -168,16 +168,26 @@ class ActionalServer extends EventEmitter {
 
       debug('%s requesting to send data to client %s', socket.id, targetClient.socket.id, eventName, args);
       
-      const result = (await allSettled([
-        sendAndRecieve({ socket: targetClient.socket, timeout: this.config.ackTimeout }, eventName, ...args)
-      ]))[0];
+      try {
+        const result = (await sendAndRecieve({
+          socket: targetClient.socket, timeout: this.config.ackTimeout }, eventName, ...args))[0] as ClientEventResponse<unknown>;
 
-      callback({
-        ok: true,
-        status: result.status,
-        reason: result.reason,
-        result: result.value
-      });
+        if (!result.ok) callback({
+          ok: true,
+          status: 'rejected',
+          reason: result.error as ActionalResponseError
+        }); else callback({
+          ok: true,
+          status: 'fufilled',
+          result: result.result
+        });
+      } catch (err) {
+        callback({
+          ok: true,
+          status: 'rejected',
+          reason: err.toString()
+        });
+      }
     });
 
     // @TODO send to multiple sockets

@@ -4,7 +4,10 @@ export enum ResponseCode {
   InvalidArguments = 1,
   NotFound = 2,
   Forbidden = 3,
+  ClientError = 3,
 }
+
+export type Callback = (data: unknown) => void;
 
 interface ActionalResponseBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,6 +31,10 @@ export interface FindClientsResponse extends ActionalResponse {
     priority: number
     rooms: string[]
   }>
+}
+
+export interface ClientEventResponse<T> extends ActionalResponse {
+  result: T
 }
 
 export interface SendToClientResponse<T> extends ActionalResponse {
