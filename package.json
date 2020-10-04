@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Let clients pick and choose what to send to each other with Socket.IO",
   "main": "./dist/index.js",
+  "types": "./types/index.d.ts",
   "author": "Snazzah",
   "repository": "https://github.com/Snazzah/Actional",
   "license": "MIT",
