@@ -1,6 +1,6 @@
 {
   "name": "actional",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Let clients pick and choose what to send to each other with Socket.IO",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
