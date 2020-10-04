@@ -21,6 +21,7 @@ type ConditionalValue = boolean | (<T extends unknown[]>(...args: T) => (boolean
 
 class ActionalClient extends EventEmitter {
   public readonly socket: SocketIOClient.Socket;
+  public readonly manager: SocketIOClient.Manager;
   public conditionals: Record<string, ConditionalValue>;
 
   constructor(url: string, actionalOptions: ActionalClientOptions = {}, options: SocketIOClient.ConnectOpts = {}) {
@@ -40,9 +41,7 @@ class ActionalClient extends EventEmitter {
 
     // Prioritize websockets
     Object.assign(options, { transports: ['websocket', 'polling'] });
-
-    this.socket = SocketIOClient(url, options);
-    console.log(SocketIOClient.managers[urlParser(url).id]);
+    this.manager = SocketIOClient.managers[urlParser(url).id];
     this.conditionals = conditionals || {};
     this._hookEvents();
   }
