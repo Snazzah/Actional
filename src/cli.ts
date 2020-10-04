@@ -4,6 +4,7 @@ import fs from 'fs';
 import findUp from 'find-up';
 import { ActionalServerOptions } from './server';
 import debugModule from 'debug';
+import VERSION from './version';
 const debug = debugModule('actional:cli');
 
 const configPath = findUp.sync('.actional.json');
@@ -93,6 +94,8 @@ const argv = yargs
   .argv;
 
 debugModule.enable(argv.debug ? '*' : 'actional:*');
+
+console.log('Running actional v%s', VERSION);
 
 // This is defined afterwards to debug picks up the variable
 import Server from './server';
