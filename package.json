@@ -15,7 +15,7 @@
     "prepublishOnly": "npm run lint:fix"
   },
   "bin": {
-    "actional-server": "./dist/cli.js"
+    "actional-server": "./lib/cli.js"
   },
   "dependencies": {
     "@discordjs/collection": "^0.1.6",
