@@ -1,15 +1,21 @@
 import AbortController from 'abort-controller';
 import { AbortError } from './errors';
+import * as SocketIO from 'socket.io';
+import * as SocketIOClient from 'socket.io-client';
 
 interface SAROptions {
   socket: SocketIO.Socket | SocketIOClient.Socket;
   timeout?: number;
 }
 
-export function sendAndRecieve({ socket, timeout = 5000 }: SAROptions, eventName: string, ...args: unknown[]): Promise<unknown[]> {
+export function sendAndRecieve(
+  { socket, timeout = 5000 }: SAROptions,
+  eventName: string,
+  ...args: unknown[]
+): Promise<unknown[]> {
   const controller = new AbortController();
   setTimeout(controller.abort.bind(controller), timeout);
-  
+
   return new Promise((resolve, reject) => {
     controller.signal.addEventListener('abort', () => reject(new AbortError('The operation was aborted.')));
     socket.emit(eventName, ...args, (...data: unknown[]) => {
@@ -20,9 +26,9 @@ export function sendAndRecieve({ socket, timeout = 5000 }: SAROptions, eventName
 
 export interface PromiseDefinition<T, I> {
   status: 'fufilled' | 'rejected';
-  info: I
-  result?: T
-  error?: unknown
+  info: I;
+  result?: T;
+  error?: unknown;
 }
 
 export async function definePromise<T, I>(promise: Promise<T>, info: I): Promise<PromiseDefinition<T, I>> {

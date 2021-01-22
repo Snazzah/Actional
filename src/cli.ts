@@ -5,21 +5,22 @@ import findUp from 'find-up';
 import { ActionalServerOptions } from './server';
 import debugModule from 'debug';
 import VERSION from './version';
+import * as SocketIO from 'socket.io';
 const debug = debugModule('actional:cli');
 
 const configPath = findUp.sync('.actional.json');
 const config = configPath ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
 
-if (config.config !== undefined || config.c !== undefined)
-  throw new Error('You can\'t define a config in a config!');
+if (config.config !== undefined || config.c !== undefined) throw new Error("You can't define a config in a config!");
 
 const argv = yargs
   .scriptName('actional-server')
-  .config(config).config()
+  .config(config)
+  .config()
   .options({
     config: {
       describe: 'the JSON file that fills in CLI arguments for you (defaults to ".actional.json" if found)',
-      alias: 'c',
+      alias: 'c'
     },
     debug: {
       type: 'boolean',
@@ -89,9 +90,9 @@ const argv = yargs
       type: 'string',
       describe: 'name of the path to capture',
       default: '/socket.io'
-    },
-  }).command('$0', 'Runs an actional server.')
-  .argv;
+    }
+  })
+  .command('$0', 'Runs an actional server.').argv;
 
 debugModule.enable(argv.debug ? '*' : 'actional:*');
 
@@ -102,6 +103,7 @@ import Server from './server';
 
 const actionalConfig: ActionalServerOptions = argv;
 
+// @ts-ignore
 const socketIoConfig: SocketIO.ServerOptions = ((argv) => {
   const newArgv = Object.assign({}, argv);
   delete newArgv.ackTimeout;
@@ -111,11 +113,11 @@ const socketIoConfig: SocketIO.ServerOptions = ((argv) => {
 
 const server = new Server(actionalConfig, socketIoConfig);
 
-if (argv.namespaces && argv.namespaces.length)
-  argv.namespaces.map(nsp => server.of(nsp.toString()));
+if (argv.namespaces && argv.namespaces.length) argv.namespaces.map((nsp) => server.of(nsp.toString()));
 
 server.listen(argv.port);
-debug('Started listening on port', argv.port, ...[
-  argv.password ? 'with password' : 0,
-  argv.debug ? 'in debug' : 0
-].filter(v => v !== 0));
+debug(
+  'Started listening on port',
+  argv.port,
+  ...[argv.password ? 'with password' : 0, argv.debug ? 'in debug' : 0].filter((v) => v !== 0)
+);

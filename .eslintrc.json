@@ -6,8 +6,8 @@
   },
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
   ],
   "globals": {},
   "parser": "@typescript-eslint/parser",
@@ -23,13 +23,6 @@
     "dist"
   ],
   "rules": {
-    "quotes": [
-      "warn",
-      "single"
-    ],
-    "semi": [
-      "warn",
-      "always"
-    ]
+    "prettier/prettier": "warn"
   }
 }
