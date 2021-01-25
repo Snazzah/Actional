@@ -133,7 +133,7 @@ class ActionalServer extends EventEmitter {
 
       const namespace = this.server.of(payload.namespace || '/');
 
-      let clients = Object.keys(namespace.sockets)
+      let clients = Array.from(namespace.sockets.keys())
         .map((sId) => this.clients.get(sId.split('#').reverse()[0]))
         .sort((a, b) => a.priority - b.priority);
 
