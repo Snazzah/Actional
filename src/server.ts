@@ -134,7 +134,7 @@ class ActionalServer extends EventEmitter {
       const namespace = this.server.of(payload.namespace || '/');
 
       let clients = Array.from(namespace.sockets.keys())
-        .map((sId) => this.clients.get(sId.split('#').reverse()[0]))
+        .map((sId) => this.clients.get(sId.split('#').reverse()[0])!)
         .sort((a, b) => a.priority - b.priority);
 
       if (payload.rooms && payload.rooms.length)
@@ -154,11 +154,11 @@ class ActionalServer extends EventEmitter {
         const conditionResults = await this.emitToClients(clients, 'actional_condition', payload.conditions);
 
         clients = clients.filter((client) => {
-          const socketConditions: PromiseDefinition<ConditionsResponse[], SocketDefinition> = conditionResults.find(
-            (result) => result.info.id === client.socket.id
-          );
+          const socketConditions:
+            | PromiseDefinition<ConditionsResponse[], SocketDefinition>
+            | undefined = conditionResults.find((result) => result.info.id === client.socket.id);
           if (!socketConditions || socketConditions.status === 'rejected') return false;
-          return !Object.values(socketConditions.result[0].conditions).includes(false);
+          return !Object.values(socketConditions.result![0].conditions).includes(false);
         });
       }
 
@@ -260,7 +260,7 @@ class ActionalServer extends EventEmitter {
       )
     );
 
-    return results.map((res) => res.value);
+    return results.map((res: any) => res.value);
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types

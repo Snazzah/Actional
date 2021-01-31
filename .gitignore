@@ -117,4 +117,5 @@ dist
 
 testing
 .actional.json
+_pm2.json
 types

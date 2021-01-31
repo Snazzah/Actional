@@ -57,8 +57,8 @@ class ActionalClient extends EventEmitter {
     // Default query
     // @ts-ignore
     if (!options) options = {};
-    if (options.query) Object.assign(options.query, actionalOptions);
-    else options.query = actionalOptions;
+    if (options!.query) Object.assign(options!.query, actionalOptions);
+    else options!.query = actionalOptions;
 
     // Prioritize websockets
     Object.assign(options, { transports: ['websocket', 'polling'] });
@@ -74,7 +74,7 @@ class ActionalClient extends EventEmitter {
         'sending conditions',
         conditions.map((c) => c[0])
       );
-      const results = {};
+      const results: { [key: string]: boolean } = {};
 
       await allSettled(
         conditions.map(async ([condition, ...args]) => {

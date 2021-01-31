@@ -1,18 +1,27 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
     "target": "es2020",
-    "inlineSourceMap": true,
-    "baseUrl": ".",
-    "outDir": "dist",
-    "removeComments": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
+    "module": "commonjs",
+    "lib": [
+      "es2017",
+      "es7",
+      "es6"
+    ],
     "declaration": true,
-    "declarationDir": "./types",
-    "paths": {
-      "*": ["node_modules/*"]
-    }
+    "outDir": "lib",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*"]
+  "include": [
+    "**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "test",
+    "testing",
+    "scripts"
+  ]
 }

@@ -106,6 +106,7 @@ const actionalConfig: ActionalServerOptions = argv;
 // @ts-ignore
 const socketIoConfig: SocketIO.ServerOptions = ((argv) => {
   const newArgv = Object.assign({}, argv);
+  // @ts-ignore
   delete newArgv.ackTimeout;
   newArgv.transports = argv.transport == 'both' ? ['websocket', 'polling'] : argv.transport;
   return newArgv;
