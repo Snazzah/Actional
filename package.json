@@ -29,7 +29,7 @@
     "@discordjs/collection": "^0.1.6",
     "abort-controller": "^3.0.0",
     "debug": "^4.2.0",
-    "eslint-config-prettier": "^7.0.0",
+    "eslint-config-prettier": "^8.0.0",
     "eslint-plugin-prettier": "^3.3.0",
     "eventemitter3": "^4.0.7",
     "find-up": "^5.0.0",
