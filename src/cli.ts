@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import yargs = require('yargs');
 import fs from 'fs';
-import findUp from 'find-up';
+import { findUp } from 'find-up';
 import { ActionalServerOptions } from './server';
 import debugModule from 'debug';
 import VERSION from './version';
